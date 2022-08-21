@@ -548,7 +548,7 @@ c = UIS.InputBegan:Connect(function(input, processed)
                     end
                 end
             end
-             if input.KeyCode == Enum.KeyCode.End then
+             if input.KeyCode == Enum.KeyCode.P then
                  Library:Toggle()
              end
         end
