@@ -553,7 +553,7 @@ if R15toR6 then
         R6parts = { 
             head = {
                 Name = "Head",
-                Size = v3(2, 1, 1),
+                Size = v3(2, 0.97, 1),
                 R15 = {
                     Head = 0
                 }
@@ -562,7 +562,7 @@ if R15toR6 then
                 Name = "Torso",
                 Size = v3(2, 2, 1),
                 R15 = {
-                    UpperTorso = 0.2,
+                    UpperTorso = 0.17,
                     LowerTorso = -0.8
                 }
             },
@@ -570,43 +570,43 @@ if R15toR6 then
                 Name = "HumanoidRootPart",
                 Size = v3(2, 2, 1),
                 R15 = {
-                    HumanoidRootPart = 0
+                    HumanoidRootPart = -0.03
                 }
             },
             leftArm = {
                 Name = "Left Arm",
                 Size = v3(1, 2, 1),
                 R15 = {
-                    LeftHand = -0.75,
-                    LeftLowerArm = -0.18,
-                    LeftUpperArm = 0.415
+                    LeftHand = -0.74,
+                    LeftLowerArm = -0.17,
+                    LeftUpperArm = 0.385
                 }
             },
             rightArm = {
                 Name = "Right Arm",
                 Size = v3(1, 2, 1),
                 R15 = {
-                    RightHand = -0.75,
-                    RightLowerArm = -0.18,
-                    RightUpperArm = 0.415
+                    RightHand = -0.74,
+                    RightLowerArm = -0.17,
+                    RightUpperArm = 0.385
                 }
             },
             leftLeg = {
                 Name = "Left Leg",
                 Size = v3(1, 2, 1),
                 R15 = {
-                    LeftFoot = -0.85,
-                    LeftLowerLeg = -0.29,
-                    LeftUpperLeg = 0.49
+                    LeftFoot = -0.82,
+                    LeftLowerLeg = -0.26,
+                    LeftUpperLeg = 0.46
                 }
             },
             rightLeg = {
                 Name = "Right Leg",
                 Size = v3(1, 2, 1),
                 R15 = {
-                    RightFoot = -0.85,
-                    RightLowerLeg = -0.29,
-                    RightUpperLeg = 0.49
+                    RightFoot = -0.82,
+                    RightLowerLeg = -0.26,
+                    RightUpperLeg = 0.46
                 }
             }
         }
