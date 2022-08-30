@@ -13,7 +13,7 @@ function getNetlessVelocity(realPartVelocity)
     return (realPartVelocity * Vector3_101) + netless_Y
 end
 
-if game.Players.LocalPlayer.Character.Humanoid.RigType==Enum.HumanoidRigType.R6  then
+if game.Players.LocalPlayer.Character.Humanoid.RigType==Enum.HumanoidRigType.R6  then --//Got Lazy Here, stfu
     RealR6 = true
     else 
     RealR6 = false
