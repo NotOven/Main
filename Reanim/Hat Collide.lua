@@ -34,6 +34,12 @@ end)
 
 local clone, destroy, getchildren, getdescendants, isa = c.Clone, c.Destroy, c.GetChildren, c.GetDescendants, c.IsA
 
+if game.Players.LocalPlayer.Character.Humanoid.RigType==Enum.HumanoidRigType.R6  then --//Got Lazy Here, stfu
+    RealR6 = true
+    else 
+    RealR6 = false
+end
+
 local function gp(parent, name, className)
     if typeof(parent) == "Instance" then
         for i, v in pairs(getchildren(parent)) do
@@ -704,7 +710,17 @@ if R15toR6 then
         end
     end
 end
-
+if RealR6 == true then
+    if game.Players.LocalPlayer.Character:FindFirstChild('SeeMonkey') then
+monkeatt1 = gp(gp(gp(c, "SeeMonkey", "Accessory"), "Handle", "BasePart"), "att1_Handle", "Attachment")
+monkeatt1.Parent = gp(c, "Torso", "BasePart")
+monkeatt1.Orientation = v3(90, 0, 0)
+monkemesh = gp(gp(gp(model, "SeeMonkey", "Accessory"), "Handle", "BasePart"), "Mesh", "SpecialMesh")
+if monkemesh then
+    monkemesh:Destroy()
+end
+end
+end
 local torso1 = torso
 torso = gp(c, "Torso", "BasePart") or ((not R15toR6) and gp(c, torso.Name, "BasePart"))
 if (typeof(hedafterneck) == "Instance") and head and torso and torso1 then
