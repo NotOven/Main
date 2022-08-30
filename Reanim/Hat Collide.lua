@@ -13,6 +13,11 @@ function getNetlessVelocity(realPartVelocity)
     return (realPartVelocity * Vector3_101) + netless_Y
 end
 
+if game.Players.LocalPlayer.Character.Humanoid.RigType==Enum.HumanoidRigType.R6  then
+    RealR6 = true
+    else 
+    RealR6 = false
+    end
 lp = game:GetService("Players").LocalPlayer
 rs = game:GetService("RunService")
 stepped = rs.Stepped
@@ -714,12 +719,16 @@ if R15toR6 then
         end
     end
 end
-local monkeatt1 = gp(gp(gp(c, "SeeMonkey", "Accessory"), "Handle", "BasePart"), "att1_Handle", "Attachment")
+if RealR6 == true then
+    if game.Players.LocalPlayer.Character:FindFirstChild('SeeMonkey') then
+monkeatt1 = gp(gp(gp(c, "SeeMonkey", "Accessory"), "Handle", "BasePart"), "att1_Handle", "Attachment")
 monkeatt1.Parent = gp(c, "Torso", "BasePart")
 monkeatt1.Orientation = v3(90, 0, 0)
-local monkemesh = gp(gp(gp(model, "SeeMonkey", "Accessory"), "Handle", "BasePart"), "Mesh", "SpecialMesh")
+monkemesh = gp(gp(gp(model, "SeeMonkey", "Accessory"), "Handle", "BasePart"), "Mesh", "SpecialMesh")
 if monkemesh then
     monkemesh:Destroy()
+end
+end
 end
 
 torso1 = torso
