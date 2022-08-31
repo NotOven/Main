@@ -831,7 +831,7 @@ if flingpart0 and flingpart1 then
                 duration = tonumber(duration) or 0.5
             end
             if typeof(rotVelocity) ~= "Vector3" then
-                rotVelocity = v3(20000, 20000, 20000)
+                rotVelocity = v3(20000, 0, 20000)
             end
             if not (target and flingpart0 and flingpart1 and att0 and att1) then
                 return
