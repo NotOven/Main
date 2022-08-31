@@ -896,4 +896,4 @@ if flingpart0 and flingpart1 then
     end
 end
 
-lp:GetMouse().Button1Down:Connect(fling) --click fling
+--lp:GetMouse().Button1Down:Connect(fling) --click fling
