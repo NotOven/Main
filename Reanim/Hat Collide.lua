@@ -590,7 +590,7 @@ if R15toR6 then
                 Name = "Left Arm",
                 Size = v3(1, 2, 1),
                 R15 = {
-                    LeftHand = -0.849,
+                    LeftHand = -0.745,
                     LeftLowerArm = -0.174,
                     LeftUpperArm = 0.415
                 }
@@ -599,7 +599,7 @@ if R15toR6 then
                 Name = "Right Arm",
                 Size = v3(1, 2, 1),
                 R15 = {
-                    RightHand = -0.849,
+                    RightHand = -0.745,
                     RightLowerArm = -0.174,
                     RightUpperArm = 0.415
                 }
