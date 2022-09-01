@@ -7,7 +7,6 @@ local function getNetlessVelocity(realPartVelocity)
             return realPartVelocity * (25.1 / realPartVelocity.Y)
         end
         realPartVelocity = unit * 125
-    end
     return (realPartVelocity * v3_101) + v3_net
 end
 
@@ -74,7 +73,7 @@ local function align(Part0, Part1)
         if Part0 == healthHide then
             healthHide = false
             tdelay(0, function()
-                while twait(2.9) and Part0 and c do
+                while twait(6.25) and Part0 and c do
                     hide = #Part0:GetConnectedParts() == 1
                     twait(0.1)
                     hide = false
