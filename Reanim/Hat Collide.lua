@@ -338,10 +338,22 @@ end
 
 local head, torso, root = gp(c, "Head", "BasePart"), gp(c, "Torso", "BasePart") or gp(c, "UpperTorso", "BasePart"), gp(c, "HumanoidRootPart", "BasePart")
 if hatcollide and c:FindFirstChildOfClass("Accessory") then
-    local anything = c:FindFirstChildOfClass("BodyColors") or gp(c, "Health", "Script")
+    local anything = gp(c, "Health", "Script")
     if not (torso and root and anything) then
         return
     end
+    local character = game.Players.LocalPlayer.Character
+
+for i,v in pairs(character:GetChildren()) do
+    if v:IsA("Accessory") then
+        sethiddenproperty(v,"BackendAccoutrementState", 0) --prepare for hat to be rewelded
+        for i,v in pairs(v.Handle:GetChildren()) do
+            if v:IsA("Attachment") then v:remove() end --remove attachments so that they get welded to head
+        end
+    end
+end
+
+character["Body Colors"]:remove()
     torso:Destroy()
     root:Destroy()
     anything:Destroy()
