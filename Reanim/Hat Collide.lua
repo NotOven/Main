@@ -1,3 +1,4 @@
+
 local v3_net, v3_101 = Vector3.new(0, 25.1, 0), Vector3.new(1, 0, 1)
 local function getNetlessVelocity(realPartVelocity)
     local mag = realPartVelocity.Magnitude
@@ -10,87 +11,7 @@ local function getNetlessVelocity(realPartVelocity)
     end
     return (realPartVelocity * v3_101) + v3_net
 end
-local simradius = "shp" --simulation radius (net bypass) method
---"shp" - sethiddenproperty
---"ssr" - setsimulationradius
---false - disable
-local healthHide = true --moves your head under map every 3 seconds so players dont see your health bar
-local noclipAllParts = false --set it to true if you want noclip
-local antiragdoll = true --removes hingeConstraints and ballSocketConstraints from your character
-local newanimate = true --disables the animate script and enables after reanimation
-local discharscripts = true --disables all localScripts parented to your character before reanimation
-local R15toR6 = false --tries to convert your character to r6 if its r15
-local hatcollide = true --makes hats cancollide (credit to ShownApe) (works only with reanimate method 0)
-local humState16 = true --enables collisions for limbs before the humanoid dies (using hum:ChangeState)
-local addtools = false --puts all tools from backpack to character and lets you hold them after reanimation
-local hedafterneck = true --disable aligns for head and enable after neck or torso is removed
-local loadtime = game:GetService("Players").RespawnTime + 0.5 --anti respawn delay
-local method = 0 --reanimation method
---methods:
---0 - breakJoints (takes [loadtime] seconds to laod)
---1 - limbs
---2 - limbs + anti respawn
---3 - limbs + breakJoints after [loadtime] seconds
---4 - remove humanoid + breakJoints
---5 - remove humanoid + limbs
-local alignmode = 2 --AlignPosition mode
---modes:
---1 - AlignPosition rigidity enabled true
---2 - 2 AlignPositions rigidity enabled both true and false
---3 - AlignPosition rigidity enabled false
---4 - CFrame (if u dont have the isnetworkowner function it will use alignmode 2)
-local flingpart = "HumanoidRootPart" --name of the part or the hat used for flinging
---the fling function
---usage: fling(target, duration, velocity)
---target can be set to: basePart, CFrame, Vector3, character model or humanoid (flings at mouse.Hit if argument not provided))
---duration (fling time in seconds) can be set to: a number or a string convertable to the number (0.5s if not provided),
---velocity (fling part rotation velocity) can be set to a vector3 value (Vector3.new(20000, 20000, 20000) if not provided)
-
-local player = game.Players.LocalPlayer.Character
-local hat = player["RockAccessory"]
-
-        sethiddenproperty(hat,"BackendAccoutrementState", 0) 
-        for i,v in pairs(hat.Handle:GetChildren()) do
-            if v:IsA("Attachment") then v:remove() end
-        end
-
-player["Body Colors"]:remove()
-wait(0.15)
-
-
-
-
-spawn(function()
-    local noclip = true char = hat while true do if noclip == true then for _,v in pairs(char:children()) do pcall(function() if v.className == "Part" then v.CanCollide = false elseif v.ClassName == "Model" then v.Head.CanCollide = false end end) end end game:service("RunService").Stepped:wait() end
-end)
---noclip hat
-hat.Handle.Material = Enum.Material.ForceField
-hat.Handle.Color = Color3.fromRGB(95, 4, 214)
-pcall(function()
-hat.Handle:WaitForChild("OriginalSize"):Destroy()
-player["Humanoid"]:WaitForChild("BodyTypeScale"):Destroy()
-hat.Handle:WaitForChild("OriginalSize"):Destroy()
-player["Humanoid"]:WaitForChild("BodyProportionScale"):Destroy()
-
-hat.Handle:WaitForChild("OriginalSize"):Destroy()
-
-player["Humanoid"]:WaitForChild("BodyWidthScale"):Destroy()
-
-hat.Handle:WaitForChild("OriginalSize"):Destroy()
-
-player["Humanoid"]:WaitForChild("BodyHeightScale"):Destroy()
-
-hat.Handle:WaitForChild("OriginalSize"):Destroy()
-
-player["Humanoid"]:WaitForChild("BodyDepthScale"):Destroy()
-
-hat.Handle:WaitForChild("OriginalSize"):Destroy()
-
-player["Humanoid"]:WaitForChild("HeadScale"):Destroy()
-wait(0.25)
-hat.Handle.Size = Vector3.new(7.2,7.2,7.2)
-end)
-
+--//
 local lp = game:GetService("Players").LocalPlayer
 local rs = game:GetService("RunService")
 local stepped = rs.Stepped
