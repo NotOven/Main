@@ -1,6 +1,4 @@
-
-local Vector3_101 = Vector3.new(1, 0, 1)
-local netless_Y = Vector3.new(0, 25.1, 0)
+local v3_net, v3_101 = Vector3.new(0, 25.1, 0), Vector3.new(1, 0, 1)
 local function getNetlessVelocity(realPartVelocity)
     local mag = realPartVelocity.Magnitude
     if mag > 1 then
@@ -10,23 +8,16 @@ local function getNetlessVelocity(realPartVelocity)
         end
         realPartVelocity = unit * 125
     end
-    return (realPartVelocity * Vector3_101) + netless_Y
+    return (realPartVelocity * v3_101) + v3_net
 end
 
 local lp = game:GetService("Players").LocalPlayer
-local rs = game:GetService("RunService")
-local stepped = rs.Stepped
-local heartbeat = rs.Heartbeat
-local renderstepped = rs.RenderStepped
-local twait = task.wait
-local tdelay = task.delay
-local sg = game:GetService("StarterGui")
-local ws = game:GetService("Workspace")
-local cf = CFrame.new
+local rs, ws, sg = game:GetService("RunService"), game:GetService("Workspace"), game:GetService("StarterGui")
+local stepped, heartbeat, renderstepped = rs.Stepped, rs.Heartbeat, rs.RenderStepped
+local twait, tdelay, rad, inf, abs = task.wait, task.delay, math.rad, math.huge, math.abs
+local cf, v3 = CFrame.new, Vector3.new
 local angles = CFrame.Angles
-local v3 = Vector3.new
-local v3_0 = v3(0, 0, 0)
-local inf = math.huge
+local v3_0, cf_0 = v3(0, 0, 0), cf(0, 0, 0)
 
 local c = lp.Character
 
@@ -53,34 +44,30 @@ local function gp(parent, name, className)
     return nil
 end
 
-if type(getNetlessVelocity) ~= "function" then
-    getNetlessVelocity = nil
-end
-
 local fenv = getfenv()
+
 local shp = fenv.sethiddenproperty or fenv.set_hidden_property or fenv.set_hidden_prop or fenv.sethiddenprop
-local ssr = fenv.setsimulationradius or fenv.set_simulation_radius or fenv.set_sim_radius or fenv.setsimradius or fenv.set_simulation_rad or fenv.setsimulationrad
+local ssr = fenv.setsimulationradius or fenv.set_simulation_radius or fenv.set_sim_radius or fenv.setsimradius or fenv.setsimrad or fenv.set_sim_rad
 local ino = fenv.isnetworkowner or fenv.is_network_owner or fenv.isnetowner or fenv.is_net_owner
+
+local ino1 = nil
+if ino then 
+    ino1 = function(v) return ino(v) or ((not v.Anchored) and (v.ReceiveAge == 0)) end
+else
+    ino1 = function(v) return (not v.Anchored) and (v.ReceiveAge == 0) end
+end
 
 healthHide = healthHide and ((method == 0) or (method == 3)) and gp(c, "Head", "BasePart")
 
-if (alignmode == 4) and (not ino) then alignmode = 2 end
-
-if type(getNetlessVelocity) ~= "function" then
-    getNetlessVelocity = function(v) return v end
-end
+local reclaim, lostpart = reclaim and c.PrimaryPart, nil
 
 local function align(Part0, Part1)
     
     local att0 = Instance.new("Attachment")
-    att0.Orientation = v3_0
-    att0.Position = v3_0
-    att0.Name = "att0_" .. Part0.Name
+    att0.Position, att0.Orientation, att0.Name = v3_0, v3_0, "att0_" .. Part0.Name
     local att1 = Instance.new("Attachment")
-    att1.Orientation = v3_0
-    att1.Position = v3_0
-    att1.Name = "att1_" .. Part1.Name
-    
+    att1.Position, att1.Orientation, att1.Name = v3_0, v3_0, "att1_" .. Part1.Name
+
     if alignmode == 4 then
     
         local hide = false
@@ -95,20 +82,44 @@ local function align(Part0, Part1)
             end)
         end
         
-        local rot = math.rad(0.05)
-        local con = nil
-        con = heartbeat:Connect(function()
-            if Part0 and Part1 and att1 then
-                if ino(Part0) then
-                    Part0.CFrame = Part1.CFrame * att1.CFrame * angles(0, 0, rot)
-                    if hide then
-                        Part0.Position += v3(0, 3000, 0)
-                    end
-                    rot = -rot
+        local rot = rad(0.05)
+        local con0, con1 = nil, nil
+        con0 = stepped:Connect(function()
+            if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
+            Part0.RotVelocity = Part1.RotVelocity
+        end)
+        local lastpos, idletime = Part0.Position, 0
+        con1 = heartbeat:Connect(function(delta)
+            if not (Part0 and Part1 and att1) then return con0:Disconnect() and con1:Disconnect() end
+            if ino1(Part0) then
+                if lostpart == Part0 then
+                    lostpart = nil
                 end
-                hbcf = Part0.CFrame
-            else
-                con:Disconnect()
+                rot = -rot
+                Part0.CFrame = Part1.CFrame * att1.CFrame * angles(0, 0, rot)
+                if Part1.Velocity.Magnitude < 0.1 then
+                    if idletime > 0.1 then
+                        local posVel = (Part0.Position - lastpos) / delta
+                        if posVel.Magnitude > 3 then
+                            posVel = posVel.Unit * 1.5
+                        end
+                        Part0.Velocity = getNetlessVelocity(posVel)
+                    else
+                        idletime += delta
+                        Part0.Velocity = getNetlessVelocity(Part1.Velocity)
+                    end
+                else
+                    Part0.Velocity = getNetlessVelocity(Part1.Velocity)
+                    idletime = 0
+                end
+                lastpos = Part0.Position
+                if lostpart and (Part0 == reclaim) then
+                    Part0.CFrame = lostpart.CFrame
+                elseif hide then
+                    Part0.Position += v3(0, 3000, 0)
+                end
+            elseif (abs(Part0.Velocity.X) < 45) and (abs(Part0.Velocity.Y) < 25) and (abs(Part0.Velocity.Z) < 45) then
+                lostpart = Part0
             end
         end)
     
@@ -117,72 +128,63 @@ local function align(Part0, Part1)
         Part0.CustomPhysicalProperties = physp
         if (alignmode == 1) or (alignmode == 2) then
             local ape = Instance.new("AlignPosition")
-            ape.ApplyAtCenterOfMass = false
-            ape.MaxForce = inf
-            ape.MaxVelocity = inf
-            ape.ReactionForceEnabled = false
-            ape.Responsiveness = 200
-            ape.Attachment1 = att1
-            ape.Attachment0 = att0
-            ape.Name = "AlignPositionRtrue"
-            ape.RigidityEnabled = true
+            ape.MaxForce, ape.MaxVelocity, ape.Responsiveness = inf, inf, inf
+            ape.ReactionForceEnabled, ape.RigidityEnabled, ape.ApplyAtCenterOfMass = false, true, false
+            ape.Attachment0, ape.Attachment1, ape.Name = att0, att1, "AlignPositionRtrue"
             ape.Parent = att0
         end
         
         if (alignmode == 2) or (alignmode == 3) then
             local apd = Instance.new("AlignPosition")
-            apd.ApplyAtCenterOfMass = false
-            apd.MaxForce = inf
-            apd.MaxVelocity = inf
-            apd.ReactionForceEnabled = false
-            apd.Responsiveness = 200
-            apd.Attachment1 = att1
-            apd.Attachment0 = att0
-            apd.Name = "AlignPositionRfalse"
-            apd.RigidityEnabled = false
+            apd.MaxForce, apd.MaxVelocity, apd.Responsiveness = inf, inf, inf
+            apd.ReactionForceEnabled, apd.RigidityEnabled, apd.ApplyAtCenterOfMass = false, false, false
+            apd.Attachment0, apd.Attachment1, apd.Name = att0, att1, "AlignPositionRfalse"
             apd.Parent = att0
         end
         
         local ao = Instance.new("AlignOrientation")
-        ao.MaxAngularVelocity = inf
-        ao.MaxTorque = inf
-        ao.PrimaryAxisOnly = false
-        ao.ReactionTorqueEnabled = false
-        ao.Responsiveness = 200
-        ao.Attachment1 = att1
-        ao.Attachment0 = att0
-        ao.RigidityEnabled = false
+        ao.MaxAngularVelocity, ao.MaxTorque, ao.Responsiveness = inf, inf, inf
+        ao.PrimaryAxisOnly, ao.ReactionTorqueEnabled, ao.RigidityEnabled = false, false, false
+        ao.Attachment0, ao.Attachment1 = att0, att1
         ao.Parent = att0
-    
-    end
-
-    local vel = Part0.Velocity
-    local con0, con1 = nil, nil
-    if alignmode == 4 then
-        con0 = stepped:Connect(function()
-            if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
-            Part0.RotVelocity = Part1.RotVelocity
-        end)
-        con1 = heartbeat:Connect(function()
-            if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
-            Part0.Velocity = getNetlessVelocity(Part1.Velocity)
-        end)
-    else
+        
+        local con0, con1 = nil, nil
+        local vel = Part0.Velocity
         con0 = renderstepped:Connect(function()
             if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
             Part0.Velocity = vel
         end)
-        con1 = heartbeat:Connect(function()
+        local lastpos, idletime = Part0.Position, 0
+        con1 = heartbeat:Connect(function(delta)
             if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
             vel = Part0.Velocity
-            Part0.Velocity = getNetlessVelocity(Part1.Velocity)
+            if Part1.Velocity.Magnitude < 0.1 then
+                if idletime > 0.1 then
+                    local posVel = (Part0.Position - lastpos) / delta
+                    if posVel.Magnitude > 3 then
+                        posVel = posVel.Unit * 1.5
+                    end
+                    Part0.Velocity = getNetlessVelocity(posVel)
+                else
+                    idletime += delta
+                    Part0.Velocity = getNetlessVelocity(Part1.Velocity)
+                end
+            else
+                Part0.Velocity = getNetlessVelocity(Part1.Velocity)
+                idletime = 0
+            end
+            lastpos = Part0.Position
         end)
-    end
     
+    end
+
     att0:GetPropertyChangedSignal("Parent"):Connect(function()
         Part0 = att0.Parent
         if not isa(Part0, "BasePart") then
             att0 = nil
+            if lostpart == Part0 then
+                lostpart = nil
+            end
             Part0 = nil
         end
     end)
@@ -199,8 +201,7 @@ local function align(Part0, Part1)
 end
 
 local function respawnrequest()
-    local ccfr = ws.CurrentCamera.CFrame
-    local c = lp.Character
+    local ccfr, c = ws.CurrentCamera.CFrame, lp.Character
     lp.Character = nil
     lp.Character = c
     local con = nil
@@ -262,7 +263,7 @@ if method == 0 then
 end
 
 if discharscripts then
-    for i, v in pairs(getchildren(c)) do
+    for i, v in pairs(getdescendants(c)) do
         if isa(v, "LocalScript") then
             v.Disabled = true
         end
@@ -301,8 +302,7 @@ local scriptNames = {}
 
 for i, v in pairs(getdescendants(c)) do
     if isa(v, "BasePart") then
-        local newName = tostring(i)
-        local exists = true
+        local newName, exists = tostring(i), true
         while exists do
             exists = OLDscripts[newName]
             if exists then
@@ -356,10 +356,7 @@ for i, v in pairs(getchildren(c)) do
             for i1, v1 in pairs(getdescendants(v)) do
                 if v1 and v1.Parent and isa(v1, "BasePart") then
                     local bv = Instance.new("BodyVelocity")
-                    bv.Velocity = v3_0
-                    bv.MaxForce = v3(1000, 1000, 1000)
-                    bv.P = 1250
-                    bv.Name = "bv_" .. v.Name
+                    bv.Velocity, bv.MaxForce, bv.P, bv.Name = v3_0, v3(1000, 1000, 1000), 1250, "bv_" .. v.Name
                     bv.Parent = v1
                 end
             end
@@ -623,28 +620,19 @@ if R15toR6 then
         for i, v in pairs(R6parts) do
             local part = clone(part)
             part:ClearAllChildren()
-            part.Name = v.Name
-            part.Size = v.Size
-            part.CFrame = cfr
-            part.Anchored = false
-            part.Transparency = 1
-            part.CanCollide = false
+            part.Name, part.Size, part.CFrame, part.Anchored, part.Transparency, part.CanCollide = v.Name, v.Size, cfr, false, 1, false
             for i1, v1 in pairs(v.R15) do
                 local R15part = gp(c, i1, "BasePart")
                 local att = gp(R15part, "att1_" .. i1, "Attachment")
                 if R15part then
-                    local weld = Instance.new("Weld", R15part)
-                    weld.Name = "Weld_" .. i1
-                    weld.Part0 = part
-                    weld.Part1 = R15part
-                    weld.C0 = cf(0, v1, 0)
-                    weld.C1 = cf(0, 0, 0)
-                    R15part.Massless = true
-                    R15part.Name = "R15_" .. i1
+                    local weld = Instance.new("Weld")
+                    weld.Part0, weld.Part1, weld.C0, weld.C1, weld.Name = part, R15part, cf(0, v1, 0), cf_0, "Weld_" .. i1
+                    weld.Parent = R15part
+                    R15part.Massless, R15part.Name = true, "R15_" .. i1
                     R15part.Parent = part
                     if att then
-                        att.Parent = part
                         att.Position = v3(0, v1, 0)
+                        att.Parent = part
                     end
                 end
             end
@@ -709,8 +697,7 @@ if R15toR6 then
             R6joints[i] = joint
         end
         if hum1 then
-            hum1.RigType = Enum.HumanoidRigType.R6
-            hum1.HipHeight = 0
+            hum1.RigType, hum1.HipHeight = Enum.HumanoidRigType.R6, 0
         end
     end
 end
@@ -718,9 +705,7 @@ end
 local torso1 = torso
 torso = gp(c, "Torso", "BasePart") or ((not R15toR6) and gp(c, torso.Name, "BasePart"))
 if (typeof(hedafterneck) == "Instance") and head and torso and torso1 then
-    local conNeck = nil
-    local conTorso = nil
-    local contorso1 = nil
+    local conNeck, conTorso, conTorso1 = nil, nil, nil
     local aligns = {}
     local function enableAligns()
         conNeck:Disconnect()
