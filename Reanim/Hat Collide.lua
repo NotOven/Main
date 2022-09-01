@@ -1,5 +1,6 @@
 
-local v3_net, v3_101 = Vector3.new(0, 25.1, 0), Vector3.new(1, 0, 1)
+local Vector3_101 = Vector3.new(1, 0, 1)
+local netless_Y = Vector3.new(0, 25.1, 0)
 local function getNetlessVelocity(realPartVelocity)
     local mag = realPartVelocity.Magnitude
     if mag > 1 then
@@ -9,17 +10,20 @@ local function getNetlessVelocity(realPartVelocity)
         end
         realPartVelocity = unit * 125
     end
-    return (realPartVelocity * v3_101) + v3_net
+    return (realPartVelocity * Vector3_101) + netless_Y
 end
---//
+
 local lp = game:GetService("Players").LocalPlayer
 local rs = game:GetService("RunService")
 local stepped = rs.Stepped
 local heartbeat = rs.Heartbeat
 local renderstepped = rs.RenderStepped
+local twait = task.wait
+local tdelay = task.delay
 local sg = game:GetService("StarterGui")
 local ws = game:GetService("Workspace")
 local cf = CFrame.new
+local angles = CFrame.Angles
 local v3 = Vector3.new
 local v3_0 = v3(0, 0, 0)
 local inf = math.huge
@@ -36,10 +40,12 @@ c:GetPropertyChangedSignal("Parent"):Connect(function()
     end
 end)
 
+local clone, destroy, getchildren, getdescendants, isa = c.Clone, c.Destroy, c.GetChildren, c.GetDescendants, c.IsA
+
 local function gp(parent, name, className)
     if typeof(parent) == "Instance" then
-        for i, v in pairs(parent:GetChildren()) do
-            if (v.Name == name) and v:IsA(className) then
+        for i, v in pairs(getchildren(parent)) do
+            if (v.Name == name) and isa(v, className) then
                 return v
             end
         end
@@ -56,11 +62,14 @@ local shp = fenv.sethiddenproperty or fenv.set_hidden_property or fenv.set_hidde
 local ssr = fenv.setsimulationradius or fenv.set_simulation_radius or fenv.set_sim_radius or fenv.setsimradius or fenv.set_simulation_rad or fenv.setsimulationrad
 local ino = fenv.isnetworkowner or fenv.is_network_owner or fenv.isnetowner or fenv.is_net_owner
 
-if (alignmode == 4) and (not ino) then
-    alignmode = 2
+healthHide = healthHide and ((method == 0) or (method == 3)) and gp(c, "Head", "BasePart")
+
+if (alignmode == 4) and (not ino) then alignmode = 2 end
+
+if type(getNetlessVelocity) ~= "function" then
+    getNetlessVelocity = function(v) return v end
 end
 
-local physp = PhysicalProperties.new(0.01, 0, 1, 0, 0)
 local function align(Part0, Part1)
     
     local att0 = Instance.new("Attachment")
@@ -74,14 +83,30 @@ local function align(Part0, Part1)
     
     if alignmode == 4 then
     
+        local hide = false
+        if Part0 == healthHide then
+            healthHide = false
+            tdelay(0, function()
+                while twait(2.9) and Part0 and c do
+                    hide = #Part0:GetConnectedParts() == 1
+                    twait(0.1)
+                    hide = false
+                end
+            end)
+        end
+        
+        local rot = math.rad(0.05)
         local con = nil
-        local rot, angles = math.rad(0.05), CFrame.Angles
-        con1 = heartbeat:Connect(function()
+        con = heartbeat:Connect(function()
             if Part0 and Part1 and att1 then
                 if ino(Part0) then
                     Part0.CFrame = Part1.CFrame * att1.CFrame * angles(0, 0, rot)
+                    if hide then
+                        Part0.Position += v3(0, 3000, 0)
+                    end
                     rot = -rot
                 end
+                hbcf = Part0.CFrame
             else
                 con:Disconnect()
             end
@@ -91,7 +116,7 @@ local function align(Part0, Part1)
         
         Part0.CustomPhysicalProperties = physp
         if (alignmode == 1) or (alignmode == 2) then
-            local ape = Instance.new("AlignPosition", att0)
+            local ape = Instance.new("AlignPosition")
             ape.ApplyAtCenterOfMass = false
             ape.MaxForce = inf
             ape.MaxVelocity = inf
@@ -101,10 +126,11 @@ local function align(Part0, Part1)
             ape.Attachment0 = att0
             ape.Name = "AlignPositionRtrue"
             ape.RigidityEnabled = true
+            ape.Parent = att0
         end
         
         if (alignmode == 2) or (alignmode == 3) then
-            local apd = Instance.new("AlignPosition", att0)
+            local apd = Instance.new("AlignPosition")
             apd.ApplyAtCenterOfMass = false
             apd.MaxForce = inf
             apd.MaxVelocity = inf
@@ -114,9 +140,10 @@ local function align(Part0, Part1)
             apd.Attachment0 = att0
             apd.Name = "AlignPositionRfalse"
             apd.RigidityEnabled = false
+            apd.Parent = att0
         end
         
-        local ao = Instance.new("AlignOrientation", att0)
+        local ao = Instance.new("AlignOrientation")
         ao.MaxAngularVelocity = inf
         ao.MaxTorque = inf
         ao.PrimaryAxisOnly = false
@@ -125,37 +152,36 @@ local function align(Part0, Part1)
         ao.Attachment1 = att1
         ao.Attachment0 = att0
         ao.RigidityEnabled = false
+        ao.Parent = att0
     
     end
 
-    if getNetlessVelocity then
-        local vel = Part0.Velocity
-        local con0, con1 = nil, nil
-        if alignmode == 4 then
-            con0 = stepped:Connect(function(_, delta)
-                if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
-                Part0.RotVelocity = Part1.RotVelocity
-            end)
-            con1 = heartbeat:Connect(function()
-                if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
-                Part0.Velocity = getNetlessVelocity(Part1.Velocity)
-            end)
-        else
-            con0 = renderstepped:Connect(function()
-                if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
-                Part0.Velocity = vel
-            end)
-            con1 = heartbeat:Connect(function()
-                if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
-                vel = Part0.Velocity
-                Part0.Velocity = getNetlessVelocity(Part1.Velocity)
-            end)
-        end
+    local vel = Part0.Velocity
+    local con0, con1 = nil, nil
+    if alignmode == 4 then
+        con0 = stepped:Connect(function()
+            if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
+            Part0.RotVelocity = Part1.RotVelocity
+        end)
+        con1 = heartbeat:Connect(function()
+            if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
+            Part0.Velocity = getNetlessVelocity(Part1.Velocity)
+        end)
+    else
+        con0 = renderstepped:Connect(function()
+            if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
+            Part0.Velocity = vel
+        end)
+        con1 = heartbeat:Connect(function()
+            if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
+            vel = Part0.Velocity
+            Part0.Velocity = getNetlessVelocity(Part1.Velocity)
+        end)
     end
     
     att0:GetPropertyChangedSignal("Parent"):Connect(function()
         Part0 = att0.Parent
-        if not Part0:IsA("BasePart") then
+        if not isa(Part0, "BasePart") then
             att0 = nil
             Part0 = nil
         end
@@ -164,7 +190,7 @@ local function align(Part0, Part1)
     
     att1:GetPropertyChangedSignal("Parent"):Connect(function()
         Part1 = att1.Parent
-        if not Part1:IsA("BasePart") then
+        if not isa(Part1, "BasePart") then
             att1 = nil
             Part1 = nil
         end
@@ -193,30 +219,32 @@ local antirespawn = (method == 0) or (method == 2) or (method == 3)
 
 hatcollide = hatcollide and (method == 0)
 
-addtools = addtools and gp(lp, "Backpack", "Backpack")
+addtools = addtools and lp:FindFirstChildOfClass("Backpack")
 
+if type(simrad) ~= "number" then simrad = 1000 end
 if shp and (simradius == "shp") then
-    spawn(function()
-        while c and heartbeat:Wait() do
-            shp(lp, "SimulationRadius", inf)
+    tdelay(0, function()
+        while c do
+            shp(lp, "SimulationRadius", simrad)
+            heartbeat:Wait()
         end
     end)
 elseif ssr and (simradius == "ssr") then
-    spawn(function()
-        while c and heartbeat:Wait() do
-            ssr(inf)
+    tdelay(0, function()
+        while c do
+            ssr(simrad)
+            heartbeat:Wait()
         end
     end)
 end
 
-antiragdoll = antiragdoll and function(v)
-    if v:IsA("HingeConstraint") or v:IsA("BallSocketConstraint") then
-        v.Parent = nil
-    end
-end
-
 if antiragdoll then
-    for i, v in pairs(c:GetDescendants()) do
+    antiragdoll = function(v)
+        if isa(v, "HingeConstraint") or isa(v, "BallSocketConstraint") then
+            v.Parent = nil
+        end
+    end
+    for i, v in pairs(getdescendants(c)) do
         antiragdoll(v)
     end
     c.DescendantAdded:Connect(antiragdoll)
@@ -227,15 +255,15 @@ if antirespawn then
 end
 
 if method == 0 then
-    wait(loadtime)
+    twait(loadtime)
     if not c then
         return
     end
 end
 
 if discharscripts then
-    for i, v in pairs(c:GetChildren()) do
-        if v:IsA("LocalScript") then
+    for i, v in pairs(getchildren(c)) do
+        if isa(v, "LocalScript") then
             v.Disabled = true
         end
     end
@@ -249,8 +277,8 @@ elseif newanimate then
 end
 
 if addtools then
-    for i, v in pairs(addtools:GetChildren()) do
-        if v:IsA("Tool") then
+    for i, v in pairs(getchildren(addtools)) do
+        if isa(v, "Tool") then
             v.Parent = c
         end
     end
@@ -263,25 +291,20 @@ end)
 
 local OLDscripts = {}
 
-for i, v in pairs(c:GetDescendants()) do
+for i, v in pairs(getdescendants(c)) do
     if v.ClassName == "Script" then
-        table.insert(OLDscripts, v)
+        OLDscripts[v.Name] = true
     end
 end
 
 local scriptNames = {}
 
-for i, v in pairs(c:GetDescendants()) do
-    if v:IsA("BasePart") then
+for i, v in pairs(getdescendants(c)) do
+    if isa(v, "BasePart") then
         local newName = tostring(i)
         local exists = true
         while exists do
-            exists = false
-            for i, v in pairs(OLDscripts) do
-                if v.Name == newName then
-                    exists = true
-                end
-            end
+            exists = OLDscripts[newName]
             if exists then
                 newName = newName .. "_"    
             end
@@ -291,39 +314,33 @@ for i, v in pairs(c:GetDescendants()) do
     end
 end
 
-c.Archivable = true
 local hum = c:FindFirstChildOfClass("Humanoid")
 if hum then
     for i, v in pairs(hum:GetPlayingAnimationTracks()) do
         v:Stop()
     end
 end
-local cl = c:Clone()
+c.Archivable = true
+local cl = clone(c)
 if hum and humState16 then
     hum:ChangeState(Enum.HumanoidStateType.Physics)
     if destroyhum then
-        wait(1.6)
+        twait(1.6)
     end
 end
-if hum and hum.Parent and destroyhum then
-    hum:Destroy()
+if destroyhum then
+    pcall(destroy, hum)
 end
 
 if not c then
     return
 end
 
-local head = gp(c, "Head", "BasePart")
-local torso = gp(c, "Torso", "BasePart") or gp(c, "UpperTorso", "BasePart")
-local root = gp(c, "HumanoidRootPart", "BasePart")
-if hatcollide and c:FindFirstChildOfClass("Accessory") then
-    local anything = c:FindFirstChildOfClass("BodyColors") or gp(c, "Health", "Script")
-    if not (torso and root and anything) then
-        return
-    end
-    torso:Destroy()
-    root:Destroy()
-    anything:Destroy()
+local head, torso, root = gp(c, "Head", "BasePart"), gp(c, "Torso", "BasePart") or gp(c, "UpperTorso", "BasePart"), gp(c, "HumanoidRootPart", "BasePart")
+if hatcollide then
+    pcall(destroy, torso)
+    pcall(destroy, root)
+    pcall(destroy, c:FindFirstChildOfClass("BodyColors") or gp(c, "Health", "Script"))
 end
 
 local model = Instance.new("Model", c)
@@ -333,16 +350,17 @@ model:GetPropertyChangedSignal("Parent"):Connect(function()
     end
 end)
 
-for i, v in pairs(c:GetChildren()) do
+for i, v in pairs(getchildren(c)) do
     if v ~= model then
-        if addtools and v:IsA("Tool") then
-            for i1, v1 in pairs(v:GetDescendants()) do
-                if v1 and v1.Parent and v1:IsA("BasePart") then
-                    local bv = Instance.new("BodyVelocity", v1)
+        if addtools and isa(v, "Tool") then
+            for i1, v1 in pairs(getdescendants(v)) do
+                if v1 and v1.Parent and isa(v1, "BasePart") then
+                    local bv = Instance.new("BodyVelocity")
                     bv.Velocity = v3_0
                     bv.MaxForce = v3(1000, 1000, 1000)
                     bv.P = 1250
                     bv.Name = "bv_" .. v.Name
+                    bv.Parent = v1
                 end
             end
         end
@@ -354,8 +372,8 @@ if breakjoints then
     model:BreakJoints()
 else
     if head and torso then
-        for i, v in pairs(model:GetDescendants()) do
-            if v:IsA("JointInstance") then
+        for i, v in pairs(getdescendants(model)) do
+            if isa(v, "JointInstance") then
                 local save = false
                 if (v.Part0 == torso) and (v.Part1 == head) then
                     save = true
@@ -368,7 +386,7 @@ else
                         hedafterneck = v
                     end
                 else
-                    v:Destroy()
+                    pcall(destroy, v)
                 end
             end
         end
@@ -378,17 +396,18 @@ else
     end
 end
 
-for i, v in pairs(cl:GetChildren()) do
+cl.Parent = ws
+for i, v in pairs(getchildren(cl)) do
     v.Parent = c
 end
-cl:Destroy()
+pcall(destroy, cl)
 
 local uncollide, noclipcon = nil, nil
 if noclipAllParts then
     uncollide = function()
         if c then
-            for i, v in pairs(c:GetDescendants()) do
-                if v:IsA("BasePart") then
+            for i, v in pairs(getdescendants(c)) do
+                if isa(v, "BasePart") then
                     v.CanCollide = false
                 end
             end
@@ -399,8 +418,8 @@ if noclipAllParts then
 else
     uncollide = function()
         if model then
-            for i, v in pairs(model:GetDescendants()) do
-                if v:IsA("BasePart") then
+            for i, v in pairs(getdescendants(model)) do
+                if isa(v, "BasePart") then
                     v.CanCollide = false
                 end
             end
@@ -412,17 +431,17 @@ end
 noclipcon = stepped:Connect(uncollide)
 uncollide()
 
-for i, scr in pairs(model:GetDescendants()) do
+for i, scr in pairs(getdescendants(model)) do
     if (scr.ClassName == "Script") and table.find(scriptNames, scr.Name) then
         local Part0 = scr.Parent
-        if Part0:IsA("BasePart") then
-            for i1, scr1 in pairs(c:GetDescendants()) do
+        if isa(Part0, "BasePart") then
+            for i1, scr1 in pairs(getdescendants(c)) do
                 if (scr1.ClassName == "Script") and (scr1.Name == scr.Name) and (not scr1:IsDescendantOf(model)) then
                     local Part1 = scr1.Parent
                     if (Part1.ClassName == Part0.ClassName) and (Part1.Name == Part0.Name) then
                         align(Part0, Part1)
-                        scr:Destroy()
-                        scr1:Destroy()
+                        pcall(destroy, scr)
+                        pcall(destroy, scr1)
                         break
                     end
                 end
@@ -431,18 +450,18 @@ for i, scr in pairs(model:GetDescendants()) do
     end
 end
 
-for i, v in pairs(c:GetDescendants()) do
+for i, v in pairs(getdescendants(c)) do
     if v and v.Parent and (not v:IsDescendantOf(model)) then
-        if v:IsA("Decal") then
+        if isa(v, "Decal") then
             v.Transparency = 1
-        elseif v:IsA("BasePart") then
+        elseif isa(v, "BasePart") then
             v.Transparency = 1
             v.Anchored = false
-        elseif v:IsA("ForceField") then
+        elseif isa(v, "ForceField") then
             v.Visible = false
-        elseif v:IsA("Sound") then
+        elseif isa(v, "Sound") then
             v.Playing = false
-        elseif v:IsA("BillboardGui") or v:IsA("SurfaceGui") or v:IsA("ParticleEmitter") or v:IsA("Fire") or v:IsA("Smoke") or v:IsA("Sparkles") then
+        elseif isa(v, "BillboardGui") or isa(v, "SurfaceGui") or isa(v, "ParticleEmitter") or isa(v, "Fire") or isa(v, "Smoke") or isa(v, "Sparkles") then
             v.Enabled = false
         end
     end
@@ -456,8 +475,8 @@ if newanimate then
 end
 
 if addtools then
-    for i, v in pairs(c:GetChildren()) do
-        if v:IsA("Tool") then
+    for i, v in pairs(getchildren(c)) do
+        if isa(v, "Tool") then
             v.Parent = addtools
         end
     end
@@ -500,7 +519,7 @@ end
 
 local rb = Instance.new("BindableEvent", c)
 rb.Event:Connect(function()
-    rb:Destroy()
+    pcall(destroy, rb)
     sg:SetCore("ResetButtonCallback", true)
     if destroyhum then
         if c then c:BreakJoints() end
@@ -516,11 +535,12 @@ rb.Event:Connect(function()
 end)
 sg:SetCore("ResetButtonCallback", rb)
 
-spawn(function()
-    while wait() and c do
+tdelay(0, function()
+    while c do
         if hum0 and hum1 then
             hum1.Jump = hum0.Jump
         end
+        wait()
     end
     sg:SetCore("ResetButtonCallback", true)
 end)
@@ -590,10 +610,10 @@ if R15toR6 then
                 }
             }
         }
-        for i, v in pairs(c:GetChildren()) do
-            if v:IsA("BasePart") then
-                for i1, v1 in pairs(v:GetChildren()) do
-                    if v1:IsA("Motor6D") then
+        for i, v in pairs(getchildren(c)) do
+            if isa(v, "BasePart") then
+                for i1, v1 in pairs(getchildren(v)) do
+                    if isa(v1, "Motor6D") then
                         v1.Part0 = nil
                     end
                 end
@@ -601,7 +621,7 @@ if R15toR6 then
         end
         part.Archivable = true
         for i, v in pairs(R6parts) do
-            local part = part:Clone()
+            local part = clone(part)
             part:ClearAllChildren()
             part.Name = v.Name
             part.Size = v.Size
@@ -717,8 +737,8 @@ if (typeof(hedafterneck) == "Instance") and head and torso and torso1 then
     end)
     conTorso = torso:GetPropertyChangedSignal("Parent"):Connect(enableAligns)
     conTorso1 = torso1:GetPropertyChangedSignal("Parent"):Connect(enableAligns)
-    for i, v in pairs(head:GetDescendants()) do
-        if v:IsA("AlignPosition") or v:IsA("AlignOrientation") then
+    for i, v in pairs(getdescendants(head)) do
+        if isa(v, "AlignPosition") or isa(v, "AlignOrientation") then
             i = tostring(i)
             aligns[i] = v
             v:GetPropertyChangedSignal("Parent"):Connect(function()
@@ -766,18 +786,18 @@ if flingpart0 and flingpart1 then
         local mouse = lp:GetMouse()
         fling = function(target, duration, rotVelocity)
             if typeof(target) == "Instance" then
-                if target:IsA("BasePart") then
+                if isa(target, "BasePart") then
                     target = target.Position
-                elseif target:IsA("Model") then
+                elseif isa(target, "Model") then
                     target = gp(target, "HumanoidRootPart", "BasePart") or gp(target, "Torso", "BasePart") or gp(target, "UpperTorso", "BasePart") or target:FindFirstChildWhichIsA("BasePart")
                     if target then
                         target = target.Position
                     else
                         return
                     end
-                elseif target:IsA("Humanoid") then
+                elseif isa(target, "Humanoid") then
                     target = target.Parent
-                    if not (target and target:IsA("Model")) then
+                    if not (target and isa(target, "Model")) then
                         return
                     end
                     target = gp(target, "HumanoidRootPart", "BasePart") or gp(target, "Torso", "BasePart") or gp(target, "UpperTorso", "BasePart") or target:FindFirstChildWhichIsA("BasePart")
@@ -812,7 +832,8 @@ if flingpart0 and flingpart1 then
             if not (target and flingpart0 and flingpart1 and att0 and att1) then
                 return
             end
-            local flingpart = flingpart0:Clone()
+            flingpart0.Archivable = true
+            local flingpart = clone(flingpart0)
             flingpart.Transparency = 1
             flingpart.CanCollide = false
             flingpart.Name = "flingpart_" .. flingpart0.Name
@@ -850,13 +871,13 @@ if flingpart0 and flingpart1 then
                     end
                 end)
             end
-            wait(duration)
+            twait(duration)
             if lastfling ~= target then
                 if flingpart then
                     if att1 and (att1.Parent == flingpart) then
                         att1.Parent = flingpart1
                     end
-                    flingpart:Destroy()
+                    pcall(destroy, flingpart)
                 end
                 return
             end
@@ -866,9 +887,9 @@ if flingpart0 and flingpart1 then
             end
             flingpart0.RotVelocity = v3_0
             att1.Parent = flingpart1
-            if flingpart then
-                flingpart:Destroy()
-            end
+            pcall(destroy, flingpart)
         end
     end
 end
+
+--lp:GetMouse().Button1Down:Connect(fling) --click fling
