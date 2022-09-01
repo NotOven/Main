@@ -337,10 +337,14 @@ if not c then
 end
 
 local head, torso, root = gp(c, "Head", "BasePart"), gp(c, "Torso", "BasePart") or gp(c, "UpperTorso", "BasePart"), gp(c, "HumanoidRootPart", "BasePart")
-if hatcollide then
-    pcall(destroy, torso)
-    pcall(destroy, root)
-    pcall(destroy, c:FindFirstChildOfClass("BodyColors") or gp(c, "Health", "Script"))
+if hatcollide and c:FindFirstChildOfClass("Accessory") then
+    local anything = c:FindFirstChildOfClass("BodyColors") or gp(c, "Health", "Script")
+    if not (torso and root and anything) then
+        return
+    end
+    torso:Destroy()
+    root:Destroy()
+    anything:Destroy()
 end
 
 local model = Instance.new("Model", c)
