@@ -7,6 +7,7 @@ local function getNetlessVelocity(realPartVelocity)
             return realPartVelocity * (25.1 / realPartVelocity.Y)
         end
         realPartVelocity = unit * 125
+        end
     return (realPartVelocity * v3_101) + v3_net
 end
 
