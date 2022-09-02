@@ -353,7 +353,7 @@ for i,v in pairs(character:GetChildren()) do
     end
 end
 
-    anything:Remove()
+    character["Body Colors"]:Remove()
     torso:Destroy()
     root:Destroy()
     anything:Destroy()
