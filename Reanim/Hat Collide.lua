@@ -1,3 +1,4 @@
+--// not mine lmaoz
 local v3_net, v3_101 = Vector3.new(0, 25.1, 0), Vector3.new(1, 0, 1)
 local function getNetlessVelocity(realPartVelocity)
     local mag = realPartVelocity.Magnitude
