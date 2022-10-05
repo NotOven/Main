@@ -1,27 +1,25 @@
---// not mine lmaoz
-local v3_net, v3_101 = Vector3.new(0, 25.1, 0), Vector3.new(1, 0, 1)
+--reanimate by MyWorld
+local v3_net, v3_808 = Vector3.new(0, 25.1, 0), Vector3.new(8, 0, 8)
 local function getNetlessVelocity(realPartVelocity)
     local mag = realPartVelocity.Magnitude
     if mag > 1 then
         local unit = realPartVelocity.Unit
         if (unit.Y > 0.25) or (unit.Y < -0.75) then
-            return realPartVelocity * (25.1 / realPartVelocity.Y)
+            return unit * (25.1 / unit.Y)
         end
-        realPartVelocity = unit * 125
-        end
-    return (realPartVelocity * v3_101) + v3_net
+    end
+    return v3_net + realPartVelocity * v3_808
 end
 
 local lp = game:GetService("Players").LocalPlayer
 local rs, ws, sg = game:GetService("RunService"), game:GetService("Workspace"), game:GetService("StarterGui")
 local stepped, heartbeat, renderstepped = rs.Stepped, rs.Heartbeat, rs.RenderStepped
-local twait, tdelay, rad, inf, abs = task.wait, task.delay, math.rad, math.huge, math.abs
+local twait, tdelay, rad, inf, abs, clamp = task.wait, task.delay, math.rad, math.huge, math.abs, math.clamp
 local cf, v3 = CFrame.new, Vector3.new
 local angles = CFrame.Angles
 local v3_0, cf_0 = v3(0, 0, 0), cf(0, 0, 0)
 
 local c = lp.Character
-
 if not (c and c.Parent) then
     return
 end
@@ -49,14 +47,6 @@ local fenv = getfenv()
 
 local shp = fenv.sethiddenproperty or fenv.set_hidden_property or fenv.set_hidden_prop or fenv.sethiddenprop
 local ssr = fenv.setsimulationradius or fenv.set_simulation_radius or fenv.set_sim_radius or fenv.setsimradius or fenv.setsimrad or fenv.set_sim_rad
-local ino = fenv.isnetworkowner or fenv.is_network_owner or fenv.isnetowner or fenv.is_net_owner
-
-local ino1 = nil
-if ino then 
-    ino1 = function(v) return ino(v) or ((not v.Anchored) and (v.ReceiveAge == 0)) end
-else
-    ino1 = function(v) return (not v.Anchored) and (v.ReceiveAge == 0) end
-end
 
 healthHide = healthHide and ((method == 0) or (method == 3)) and gp(c, "Head", "BasePart")
 
@@ -75,7 +65,7 @@ local function align(Part0, Part1)
         if Part0 == healthHide then
             healthHide = false
             tdelay(0, function()
-                while twait(6.25) and Part0 and c do
+                while twait(2.9) and Part0 and c do
                     hide = #Part0:GetConnectedParts() == 1
                     twait(0.1)
                     hide = false
@@ -89,37 +79,31 @@ local function align(Part0, Part1)
             if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
             Part0.RotVelocity = Part1.RotVelocity
         end)
-        local lastpos, idletime = Part0.Position, 0
+        local lastpos = Part0.Position
         con1 = heartbeat:Connect(function(delta)
             if not (Part0 and Part1 and att1) then return con0:Disconnect() and con1:Disconnect() end
-            if ino1(Part0) then
+            if (not Part0.Anchored) and (Part0.ReceiveAge == 0) then
                 if lostpart == Part0 then
                     lostpart = nil
                 end
                 rot = -rot
-                Part0.CFrame = Part1.CFrame * att1.CFrame * angles(0, 0, rot)
-                if Part1.Velocity.Magnitude < 0.1 then
-                    if idletime > 0.1 then
-                        local posVel = (Part0.Position - lastpos) / delta
-                        if posVel.Magnitude > 3 then
-                            posVel = posVel.Unit * 1.5
-                        end
-                        Part0.Velocity = getNetlessVelocity(posVel)
-                    else
-                        idletime += delta
-                        Part0.Velocity = getNetlessVelocity(Part1.Velocity)
-                    end
-                else
+                local newcf = Part1.CFrame * att1.CFrame * angles(0, 0, rot)
+                if Part1.Velocity.Magnitude > 0.01 then
                     Part0.Velocity = getNetlessVelocity(Part1.Velocity)
-                    idletime = 0
+                else
+                    Part0.Velocity = getNetlessVelocity((newcf.Position - lastpos) / delta)
                 end
-                lastpos = Part0.Position
+                lastpos = newcf.Position
                 if lostpart and (Part0 == reclaim) then
-                    Part0.CFrame = lostpart.CFrame
+                    newcf = lostpart.CFrame
                 elseif hide then
-                    Part0.Position += v3(0, 3000, 0)
+                    newcf += v3(0, 3000, 0)
                 end
-            elseif (abs(Part0.Velocity.X) < 45) and (abs(Part0.Velocity.Y) < 25) and (abs(Part0.Velocity.Z) < 45) then
+                if novoid and (newcf.Y < ws.FallenPartsDestroyHeight + 0.1) then
+                    newcf += v3(0, ws.FallenPartsDestroyHeight + 0.1 - newcf.Y, 0)
+                end
+                Part0.CFrame = newcf
+            elseif (not Part0.Anchored) and (abs(Part0.Velocity.X) < 45) and (abs(Part0.Velocity.Y) < 25) and (abs(Part0.Velocity.Z) < 45) then
                 lostpart = Part0
             end
         end)
@@ -155,24 +139,14 @@ local function align(Part0, Part1)
             if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
             Part0.Velocity = vel
         end)
-        local lastpos, idletime = Part0.Position, 0
+        local lastpos = Part0.Position
         con1 = heartbeat:Connect(function(delta)
             if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
             vel = Part0.Velocity
-            if Part1.Velocity.Magnitude < 0.1 then
-                if idletime > 0.1 then
-                    local posVel = (Part0.Position - lastpos) / delta
-                    if posVel.Magnitude > 3 then
-                        posVel = posVel.Unit * 1.5
-                    end
-                    Part0.Velocity = getNetlessVelocity(posVel)
-                else
-                    idletime += delta
-                    Part0.Velocity = getNetlessVelocity(Part1.Velocity)
-                end
-            else
+            if Part1.Velocity.Magnitude > 0.01 then
                 Part0.Velocity = getNetlessVelocity(Part1.Velocity)
-                idletime = 0
+            else
+                Part0.Velocity = getNetlessVelocity((Part0.Position - lastpos) / delta)
             end
             lastpos = Part0.Position
         end)
@@ -591,8 +565,8 @@ if R15toR6 then
                 Name = "Left Arm",
                 Size = v3(1, 2, 1),
                 R15 = {
-                    LeftHand = -0.758,
-                    LeftLowerArm = -0.182,
+                    LeftHand = -0.849,
+                    LeftLowerArm = -0.174,
                     LeftUpperArm = 0.415
                 }
             },
@@ -600,8 +574,8 @@ if R15toR6 then
                 Name = "Right Arm",
                 Size = v3(1, 2, 1),
                 R15 = {
-                    RightHand = -0.758,
-                    RightLowerArm = -0.182,
+                    RightHand = -0.849,
+                    RightLowerArm = -0.174,
                     RightUpperArm = 0.415
                 }
             },
@@ -893,5 +867,3 @@ if flingpart0 and flingpart1 then
         end
     end
 end
-
-lp:GetMouse().Button1Down:Connect(fling) --click fling
