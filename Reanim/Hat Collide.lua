@@ -1,3 +1,45 @@
+simradius = "shp" --simulation radius (net bypass) method
+--"shp" - sethiddenproperty
+--"ssr" - setsimulationradius
+--false - disable
+rescale = true
+simrad = 1000 --simulation radius value
+healthHide = true --moves your head away every 3 seconds so players dont see your health bar (alignmode 4 only)
+reclaim = true --if you lost control over a part this will move your primary part to the part so you get it back (alignmode 4)
+novoid = true --prevents parts from going under workspace.FallenPartsDestroyHeight if you control them (alignmode 4 only)
+physp = nil --PhysicalProperties.new(0.01, 0, 1, 0, 0) --sets .CustomPhysicalProperties to this for each part
+noclipAllParts = false --set it to true if you want noclip
+antiragdoll = true --removes hingeConstraints and ballSocketConstraints from your character
+newanimate = true --disables the animate script and enables after reanimation
+discharscripts = true --disables all localScripts parented to your character before reanimation
+R15toR6 = true --tries to convert your character to r6 if its r15
+hatcollide = false --makes hats cancollide (credit to ShownApe) (works only with reanimate method 0)
+humState16 = true --enables collisions for limbs before the humanoid dies (using hum:ChangeState)
+addtools = false --puts all tools from backpack to character and lets you hold them after reanimation
+hedafterneck = true --disable aligns for head and enable after neck or torso is removed
+loadtime = game:GetService("Players").RespawnTime + 0.5 --anti respawn delay
+method = 3 --reanimation method
+--methods:
+--0 - breakJoints (takes [loadtime] seconds to load)
+--1 - limbs
+--2 - limbs + anti respawn
+--3 - limbs + breakJoints after [loadtime] seconds
+--4 - remove humanoid + breakJoints
+--5 - remove humanoid + limbst
+alignmode = 4 --AlignPosition mode
+--modes:
+--1 - AlignPosition rigidity enabled true
+--2 - 2 AlignPositions rigidity enabled both true and false
+--3 - AlignPosition rigidity enabled false
+--4 - CFrame
+flingpart = "HumanoidRootPart" --name of the part or the hat used for flinging
+--the fling function
+--usage: fling(target, duration, velocity)
+--target can be set to: basePart, CFrame, Vector3, character model or humanoid (flings at mouse.Hit if argument not provided))
+--duration (fling time in seconds) can be set to a number or a string convertable to the number (0.5s if not provided),
+--velocity (fling part rotation velocity) can be set to a vector3 value (Vector3.new(20000, 20000, 20000) if not provided)
+
+
 --reanimate by MyWorld
 local v3_net, v3_808 = Vector3.new(0, 25.1, 0), Vector3.new(8, 0, 8)
 local function getNetlessVelocity(realPartVelocity)
@@ -333,6 +375,32 @@ end
     root:Destroy()
     anything:Destroy()
 end
+HeadHeight = 0
+if rescale and c.Humanoid.RigType == Enum.HumanoidRigType.R15 then
+    HeadHeight = 0.2
+local humanoid = c:FindFirstChildOfClass("Humanoid")
+local function wipe_parts()
+    for _, part in pairs(game.Players.LocalPlayer.Character:GetDescendants()) do
+        if part:IsA("BasePart") and part.Name ~= "Head" and not part.Parent:IsA('Tool') then
+            for _, attachment in pairs(part:GetDescendants()) do
+                if attachment:IsA("Attachment") and attachment:FindFirstChild("OriginalPosition") then
+                    attachment.OriginalPosition:Destroy()
+                end
+            end
+            part:WaitForChild("OriginalSize"):Destroy()
+                
+            end
+        end
+    end
+wipe_parts()
+humanoid:WaitForChild("BodyTypeScale"):Destroy()
+wipe_parts()
+humanoid:WaitForChild("BodyWidthScale"):Destroy()
+wipe_parts()
+humanoid:WaitForChild("BodyDepthScale"):Destroy()
+wipe_parts()
+humanoid:WaitForChild("HeadScale"):Destroy()
+end
 
 local model = Instance.new("Model", c)
 model:GetPropertyChangedSignal("Parent"):Connect(function()
@@ -541,9 +609,9 @@ if R15toR6 then
         local R6parts = { 
             head = {
                 Name = "Head",
-                Size = v3(2, 1, 1),
+                Size = v3(2, 1.25, 1),
                 R15 = {
-                    Head = 0
+                    Head = HeadHeight
                 }
             },
             torso = {
@@ -565,7 +633,7 @@ if R15toR6 then
                 Name = "Left Arm",
                 Size = v3(1, 2, 1),
                 R15 = {
-                    LeftHand = -0.849,
+                    LeftHand = -0.76,
                     LeftLowerArm = -0.174,
                     LeftUpperArm = 0.415
                 }
@@ -574,7 +642,7 @@ if R15toR6 then
                 Name = "Right Arm",
                 Size = v3(1, 2, 1),
                 R15 = {
-                    RightHand = -0.849,
+                    RightHand = -0.76,
                     RightLowerArm = -0.174,
                     RightUpperArm = 0.415
                 }
