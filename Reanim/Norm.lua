@@ -97,7 +97,7 @@ local function align(Part0, Part1)
                 if lostpart and (Part0 == reclaim) then
                     newcf = lostpart.CFrame
                 elseif hide then
-                    newcf += v3(0, 5000, 0)
+                    newcf += v3(0, 3500, 0)
                 end
                 if novoid and (newcf.Y < ws.FallenPartsDestroyHeight + 0.1) then
                     newcf += v3(0, ws.FallenPartsDestroyHeight + 0.1 - newcf.Y, 0)
