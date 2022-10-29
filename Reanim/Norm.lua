@@ -321,9 +321,9 @@ if hatcollide and c:FindFirstChildOfClass("Accessory") then
 
 for i,v in pairs(character:GetChildren()) do
     if v:IsA("Accessory") then
-        sethiddenproperty(v,"BackendAccoutrementState", 0) --prepare for hat to be rewelded
+        sethiddenproperty(v,"BackendAccoutrementState", 0)
         for i,v in pairs(v.Handle:GetChildren()) do
-            if v:IsA("Attachment") then v:remove() end --remove attachments so that they get welded to head
+            if v:IsA("Attachment") then v:remove() end
         end
     end
 end
@@ -462,6 +462,14 @@ for i, scr in pairs(getdescendants(model)) do
             end
         end
     end
+end
+
+
+Headless = Headless and ((method == 0) or (method == 3)) and gp(c, "Head", "BasePart")
+
+
+if Headless then
+
 end
 
 for i, v in pairs(getdescendants(c)) do
