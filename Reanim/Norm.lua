@@ -65,7 +65,7 @@ local function align(Part0, Part1)
         if Part0 == healthHide then
             healthHide = false
             tdelay(0, function()
-                while twait(6) and Part0 and c do
+                while twait(2.9) and Part0 and c do
                     hide = #Part0:GetConnectedParts() == 1
                     twait(0.1)
                     hide = false
@@ -97,7 +97,7 @@ local function align(Part0, Part1)
                 if lostpart and (Part0 == reclaim) then
                     newcf = lostpart.CFrame
                 elseif hide then
-                    newcf += v3(0, 3500, 0)
+                    newcf += v3(0, 3000, 0)
                 end
                 if novoid and (newcf.Y < ws.FallenPartsDestroyHeight + 0.1) then
                     newcf += v3(0, ws.FallenPartsDestroyHeight + 0.1 - newcf.Y, 0)
