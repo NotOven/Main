@@ -460,8 +460,8 @@ end
 noclipcon = stepped:Connect(uncollide)
 uncollide()
 --Setting Hrp To Collide = false Cuz Yeah
-if c.HumanoidRootPart.CanCollide then c.HumanoidRootPart.CanCollide = false end
-if model.HumanoidRootPart.CanCollide then model.HumanoidRootPart.CanCollide = false end
+if c:FindFirstChild("HumanoidRootPart").CanCollide then c.HumanoidRootPart.CanCollide = false end
+if model:FindFirstChild("HumanoidRootPart").CanCollide then model.HumanoidRootPart.CanCollide = false end
 
 for i, scr in pairs(getdescendants(model)) do
     if (scr.ClassName == "Script") and table.find(scriptNames, scr.Name) then
