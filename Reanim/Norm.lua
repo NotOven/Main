@@ -350,18 +350,15 @@ if not c then
     return
 end
 
---Setting Hrp To Collide = false Cuz Yeah
-if c.HumanoidRootPart then c.HumanoidRootPart.CanCollide = false end
-if model.HumanoidRootPart then model.HumanoidRootPart.CanCollide = false end
-
 local head, torso, root = gp(c, "Head", "BasePart"), gp(c, "Torso", "BasePart") or gp(c, "UpperTorso", "BasePart"), gp(c, "HumanoidRootPart", "BasePart")
+if root then root.CanCollide = false end
 if hatcollide and c:FindFirstChildOfClass("Accessory") then
     local anything = gp(c, "Health", "Script")
     if not (torso and root and anything) then
         return
     end
 
-c.HumanoidRootPart.CFrame = c.HumanoidRootPart.CFrame + Vector3.new(10,75,0)
+c.HumanoidRootPart.CFrame = c.HumanoidRootPart.CFrame + Vector3.new(10,40,0)
 task.wait(.15)
 for i,v in pairs(c:GetChildren()) do
     if v:IsA("Accessory") then
@@ -675,6 +672,7 @@ if R15toR6 then
             part.Parent = c
             R6parts[i] = part
         end
+        if c.HumanoidRootPart.R15_HumanoidRootPart then c.HumanoidRootPart.R15_HumanoidRootPart.CanCollide = false end
         local R6joints = {
             neck = {
                 Parent = R6parts.torso,
