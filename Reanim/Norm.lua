@@ -357,7 +357,7 @@ if hatcollide and c:FindFirstChildOfClass("Accessory") then
         return
     end
 
-c.HumanoidRootPart.CFrame = c.HumanoidRootPart.CFrame + Vector3.new(65,75,30)
+c.HumanoidRootPart.CFrame = c.HumanoidRootPart.CFrame + Vector3.new(10,75,0)
 task.wait(.15)
 for i,v in pairs(c:GetChildren()) do
     if v:IsA("Accessory") then
