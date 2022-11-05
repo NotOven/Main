@@ -358,8 +358,8 @@ if hatcollide and c:FindFirstChildOfClass("Accessory") then
         return
     end
 
-c.HumanoidRootPart.CFrame = c.HumanoidRootPart.CFrame + Vector3.new(10,40,0)
-task.wait(.15)
+c.HumanoidRootPart.CFrame = c.HumanoidRootPart.CFrame + Vector3.new(0,40,0)
+
 for i,v in pairs(c:GetChildren()) do
     if v:IsA("Accessory") then
         sethiddenproperty(v,"BackendAccoutrementState", 0)
@@ -373,7 +373,7 @@ end
     torso:Destroy()
     root:Destroy()
     anything:Destroy()
-    task.wait(.1)
+    task.wait(.15)
 end
 
 local model = Instance.new("Model", c)
