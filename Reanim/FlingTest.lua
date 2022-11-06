@@ -1,6 +1,17 @@
 
-local v3_net, v3_808, FlingVel = Vector3.new(0.1, 25.1, 0.1), Vector3.new(8, 0, 8), Vector3.new(3000, 0, 3000)
+local v3_net, v3_808, FlingVel = Vector3.new(0.1, 25.1, 0.1), Vector3.new(8, 0, 8), Vector3.new(5000, 5000, 5000)
 local function getNetlessVelocity(realPartVelocity)
+    if realPartVelocity.Magnitude > 1 then
+        local unit = realPartVelocity.Unit
+        if (unit.Y > 0.25) or (unit.Y < -0.75) then
+            return unit * (25.1 / unit.Y)
+        end
+    end
+    return FlingVel + v3_net + realPartVelocity * v3_808
+end
+
+local Flingv3_net, Flingv3_808, FlingVel = Vector3.new(0.1, 25.1, 0.1), Vector3.new(8, 0, 8), Vector3.new(5000, 5000, 5000)
+local function FlingVelocity(realPartVelocity)
     if realPartVelocity.Magnitude > 1 then
         local unit = realPartVelocity.Unit
         if (unit.Y > 0.25) or (unit.Y < -0.75) then
@@ -78,6 +89,9 @@ local function align(Part0, Part1)
         
         local rot = rad(0.05)
         local con0, con1 = nil, nil
+        FlingHb = heartbeat:Connect(function()
+            c.Torso.Velocity = FlingVelocity(c.Torso.Velocity)
+            end)
         con0 = stepped:Connect(function()
             if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
             Part0.RotVelocity = Part1.RotVelocity
