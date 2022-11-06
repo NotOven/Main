@@ -30,6 +30,11 @@ end)
 
 local clone, destroy, getchildren, getdescendants, isa = c.Clone, c.Destroy, c.GetChildren, c.GetDescendants, c.IsA
 
+    c.Animate.Disabled = true
+	for i,v in next, c.Humanoid:GetPlayingAnimationTracks() do
+		v:Stop()
+	end
+	
 local function gp(parent, name, className)
     if typeof(parent) == "Instance" then
         for i, v in pairs(getchildren(parent)) do
