@@ -307,7 +307,7 @@ HeadHeight = 0
 if rescale and c.Humanoid.RigType == Enum.HumanoidRigType.R15 then
     HeadHeight = 0.2
 local function Rescale()
-    for i,v in pairs(c:GetChildren()) do
+    for i,v in pairs(c:GetDescendants()) do
         if v:IsA("BasePart") then
             if v.Name == "Handle" or v.Name == "Head" then
                 if c.Head:FindFirstChild("OriginalSize") then
