@@ -306,8 +306,8 @@ end
 HeadHeight = 0
 if rescale and c.Humanoid.RigType == Enum.HumanoidRigType.R15 then
     HeadHeight = 0.2
-local function wipe_parts()
-    for i,v in pairs(c:GetDescendants()) do
+local function Rescale()
+    for i,v in pairs(c:GetChildren()) do
         if v:IsA("BasePart") then
             if v.Name == "Handle" or v.Name == "Head" then
                 if c.Head:FindFirstChild("OriginalSize") then
@@ -329,13 +329,13 @@ local function wipe_parts()
         end
     end
     end
-wipe_parts()
+Rescale()
 hum:WaitForChild("BodyTypeScale"):Destroy()
-wipe_parts()
+Rescale()
 hum:WaitForChild("BodyWidthScale"):Destroy()
-wipe_parts()
+Rescale()
 hum:WaitForChild("BodyDepthScale"):Destroy()
-wipe_parts()
+Rescale()
 hum:WaitForChild("HeadScale"):Destroy()
 end
 
