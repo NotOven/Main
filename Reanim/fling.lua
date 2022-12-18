@@ -1,5 +1,40 @@
+simradius = "shp" --simulation radius (net bypass) method
+--"shp" - sethiddenproperty
+--"ssr" - setsimulationradius
+--false - disable
 
-local v3_net, v3_808, FlingVel = Vector3.new(0.1, 25.1, 0.1), Vector3.new(8, 0, 8), Vector3.new(5000, 5000, 5000)
+rescale = true -- rescales ur r15 character
+simrad = 1000 --simulation radius value
+healthHide = true --moves your head away every 3 seconds so players dont see your health bar (alignmode 4 only)
+reclaim = true --if you lost control over a part this will move your primary part to the part so you get it back (alignmode 4)
+novoid = true --prevents parts from going under workspace.FallenPartsDestroyHeight if you control them (alignmode 4 only)
+physp = nil --PhysicalProperties.new(0.01, 0, 1, 0, 0) --sets .CustomPhysicalProperties to this for each part
+noclipAllParts = false --set it to true if you want noclipe
+antiragdoll = true --removes hingeConstraints and ballSocketConstraints from your character
+newanimate = true --disables the animate script and enables after reanimation
+discharscripts = true --disables all localScripts parented to your character before reanimation
+R15toR6 = true --tries to convert your character to r6 if its r15
+hatcollide = false --makes hats cancollide (credit to ShownApe) (works only with reanimate method 0)
+humState16 = true --enables collisions for limbs before the humanoid dies (using hum:ChangeState)
+addtools = false --puts all tools from backpack to character and lets you hold them after reanimation
+hedafterneck = true --disable aligns for head and enable after neck or torso is removed
+loadtime = game:GetService("Players").RespawnTime + 0.45 --anti respawn delay
+method = 1 --reanimation method
+--methods:
+--0 - breakJoints (takes [loadtime] seconds to load)
+--1 - limbs
+--2 - limbs + anti respawn
+--3 - limbs + breakJoints after [loadtime] seconds
+--4 - remove humanoid + breakJoints
+--5 - remove humanoid + limbst
+alignmode = 2 --AlignPosition mode
+--modes:
+--1 - AlignPosition rigidity enabled true
+--2 - 2 AlignPositions rigidity enabled both true and false
+--3 - AlignPosition rigidity enabled false
+--4 - CFrame
+
+local v3_net, v3_808, v3_Fling = Vector3.new(0.1, 25.1, 0.1), Vector3.new(8, 0, 8), Vector3.new(1500, 1500, 1500)
 local function getNetlessVelocity(realPartVelocity)
     if realPartVelocity.Magnitude > 1 then
         local unit = realPartVelocity.Unit
@@ -7,18 +42,7 @@ local function getNetlessVelocity(realPartVelocity)
             return unit * (25.1 / unit.Y)
         end
     end
-    return FlingVel + v3_net + realPartVelocity * v3_808
-end
-
-local Flingv3_net, Flingv3_808, FlingVel = Vector3.new(0.1, 25.1, 0.1), Vector3.new(8, 0, 8), Vector3.new(5000, 5000, 5000)
-local function FlingVelocity(realPartVelocity)
-    if realPartVelocity.Magnitude > 1 then
-        local unit = realPartVelocity.Unit
-        if (unit.Y > 0.25) or (unit.Y < -0.75) then
-            return unit * (25.1 / unit.Y)
-        end
-    end
-    return FlingVel + v3_net + realPartVelocity * v3_808
+    return v3_Fling + v3_net + realPartVelocity * v3_808
 end
 
 local lp = game:GetService("Players").LocalPlayer
@@ -89,9 +113,6 @@ local function align(Part0, Part1)
         
         local rot = rad(0.05)
         local con0, con1 = nil, nil
-        FlingHb = heartbeat:Connect(function()
-            c.Torso.Velocity = FlingVelocity(c.Torso.Velocity)
-            end)
         con0 = stepped:Connect(function()
             if not (Part0 and Part1) then return con0:Disconnect() and con1:Disconnect() end
             Part0.RotVelocity = Part1.RotVelocity
@@ -320,7 +341,7 @@ end
 HeadHeight = 0
 if rescale and c.Humanoid.RigType == Enum.HumanoidRigType.R15 then
     HeadHeight = 0.2
-local function wipe_parts()
+local function Rescale()
     for i,v in pairs(c:GetDescendants()) do
         if v:IsA("BasePart") then
             if v.Name == "Handle" or v.Name == "Head" then
@@ -343,13 +364,13 @@ local function wipe_parts()
         end
     end
     end
-wipe_parts()
+Rescale()
 hum:WaitForChild("BodyTypeScale"):Destroy()
-wipe_parts()
+Rescale()
 hum:WaitForChild("BodyWidthScale"):Destroy()
-wipe_parts()
+Rescale()
 hum:WaitForChild("BodyDepthScale"):Destroy()
-wipe_parts()
+Rescale()
 hum:WaitForChild("HeadScale"):Destroy()
 end
 
