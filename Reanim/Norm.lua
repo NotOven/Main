@@ -1,15 +1,3 @@
-
-local v3_net, v3_808 = Vector3.new(0.1, 25.1, 0.1), Vector3.new(8, 0, 8)
-local function getNetlessVelocity(realPartVelocity)
-    if realPartVelocity.Magnitude > 1 then
-        local unit = realPartVelocity.Unit
-        if (unit.Y > 0.25) or (unit.Y < -0.75) then
-            return unit * (25.1 / unit.Y)
-        end
-    end
-    return v3_net + realPartVelocity * v3_808
-end
-
 local lp = game:GetService("Players").LocalPlayer
 local rs, ws, sg = game:GetService("RunService"), game:GetService("Workspace"), game:GetService("StarterGui")
 local stepped, heartbeat, renderstepped = rs.Stepped, rs.Heartbeat, rs.RenderStepped
@@ -20,6 +8,17 @@ local v3_0, cf_0 = v3(0, 0, 0), cf(0, 0, 0)
 local c = lp.Character
 if not (c and c.Parent) then
     return
+end
+
+local v3_net, v3_808 = Vector3.new(0.1, 25.1, 0.1), Vector3.new(8, 0, 8)
+local function getNetlessVelocity(realPartVelocity)
+    if realPartVelocity.Magnitude > 1 then
+        local unit = realPartVelocity.Unit
+        if (unit.Y > 0.25) or (unit.Y < -0.75) then
+            return unit * (25.1 / unit.Y)
+        end
+    end
+    return v3_net + realPartVelocity * v3_808
 end
 
 c:GetPropertyChangedSignal("Parent"):Connect(function()
@@ -51,9 +50,9 @@ local fenv = getfenv()
 local shp = fenv.sethiddenproperty or fenv.set_hidden_property or fenv.set_hidden_prop or fenv.sethiddenprop
 local ssr = fenv.setsimulationradius or fenv.set_simulation_radius or fenv.set_sim_radius or fenv.setsimradius or fenv.setsimrad or fenv.set_sim_rad
 
-healthHide = healthHide and ((method == 0) or (method == 2) or (method == 3)) and gp(c, "Head", "BasePart")
+HealthHide = HealthHide and ((method == 0) or (method == 2) or (method == 3)) and gp(c, "Head", "BasePart")
 
-local reclaim, lostpart = reclaim and c.PrimaryPart, nil
+local Reclaim, lostpart = Reclaim and c.PrimaryPart, nil
 
 local function align(Part0, Part1)
     
@@ -65,8 +64,8 @@ local function align(Part0, Part1)
     if alignmode == 4 then
     
         local hide = false
-        if Part0 == healthHide then
-            healthHide = false
+        if Part0 == HealthHide then
+            HealthHide = false
             tdelay(0, function()
                 while twait(2.9) and Part0 and c do
                     hide = #Part0:GetConnectedParts() == 1
@@ -101,12 +100,12 @@ local function align(Part0, Part1)
                     end
                 end
                 lastpos = newcf.Position
-                if lostpart and (Part0 == reclaim) then
+                if lostpart and (Part0 == Reclaim) then
                     newcf = lostpart.CFrame
                 elseif hide then
                     newcf += v3(0, 3000, 0)
                 end
-                if novoid and (newcf.Y < ws.FallenPartsDestroyHeight + 0.1) then
+                if NoVoid and (newcf.Y < ws.FallenPartsDestroyHeight + 0.1) then
                     newcf += v3(0, ws.FallenPartsDestroyHeight + 0.1 - newcf.Y, 0)
                 end
                 Part0.CFrame = newcf
@@ -117,7 +116,7 @@ local function align(Part0, Part1)
     
     else
         
-        Part0.CustomPhysicalProperties = physp
+        Part0.CustomPhysicalProperties = Physp
         if (alignmode == 1) or (alignmode == 2) then
             local ape = Instance.new("AlignPosition")
             ape.MaxForce, ape.MaxVelocity, ape.Responsiveness = inf, inf, inf
@@ -200,37 +199,29 @@ local destroyhum = (method == 4) or (method == 5)
 local breakjoints = (method == 0) or (method == 4)
 local antirespawn = (method == 0) or (method == 2) or (method == 3)
 
-hatcollide = hatcollide and (method == 0)
+HatCollide = HatCollide and (method == 0)
 
-addtools = addtools and lp:FindFirstChildOfClass("Backpack")
+NewTorso = HatCollide and NewTorso and c:FindFirstChild("SeeMonkey") and c.Humanoid.RigType == Enum.HumanoidRigType.R6
 
-if type(simrad) ~= "number" then simrad = 1000 end
-if shp and (simradius == "shp") then
+AddTools = AddTools and lp:FindFirstChildOfClass("Backpack")
+
     tdelay(0, function()
         while c do
-            shp(lp, "SimulationRadius", simrad)
+            shp(lp, "SimulationRadius", 1000)
             heartbeat:Wait()
         end
     end)
-elseif ssr and (simradius == "ssr") then
-    tdelay(0, function()
-        while c do
-            ssr(simrad)
-            heartbeat:Wait()
-        end
-    end)
-end
 
-if antiragdoll then
-    antiragdoll = function(v)
+if AntiRagdoll then
+    AntiRagdoll = function(v)
         if isa(v, "HingeConstraint") or isa(v, "BallSocketConstraint") then
             v.Parent = nil
         end
     end
     for i, v in pairs(getdescendants(c)) do
-        antiragdoll(v)
+        AntiRagdoll(v)
     end
-    c.DescendantAdded:Connect(antiragdoll)
+    c.DescendantAdded:Connect(AntiRagdoll)
 end
 
 if antirespawn then
@@ -244,23 +235,23 @@ if method == 0 then
     end
 end
 
-if discharscripts then
+if DisCharScripts then
     for i, v in pairs(getdescendants(c)) do
         if isa(v, "LocalScript") then
             v.Disabled = true
         end
     end
-elseif newanimate then
+elseif NewAnimate then
     local animate = gp(c, "Animate", "LocalScript")
     if animate and (not animate.Disabled) then
         animate.Disabled = true
     else
-        newanimate = false
+        NewAnimate = false
     end
 end
 
-if addtools then
-    for i, v in pairs(getchildren(addtools)) do
+if AddTools then
+    for i, v in pairs(getchildren(AddTools)) do
         if isa(v, "Tool") then
             v.Parent = c
         end
@@ -304,7 +295,7 @@ if hum then
 end
 
 HeadHeight = 0
-if rescale and c.Humanoid.RigType == Enum.HumanoidRigType.R15 then
+if Rescale and c.Humanoid.RigType == Enum.HumanoidRigType.R15 then
     HeadHeight = 0.2
 local function Rescale()
     for i,v in pairs(c:GetDescendants()) do
@@ -341,7 +332,7 @@ end
 
 c.Archivable = true
 local cl = clone(c)
-if hum and humState16 then
+if hum and HumState16 then
     hum:ChangeState(Enum.HumanoidStateType.Physics)
     if destroyhum then
         twait()
@@ -357,13 +348,11 @@ end
 
 local head, torso, root = gp(c, "Head", "BasePart"), gp(c, "Torso", "BasePart") or gp(c, "UpperTorso", "BasePart"), gp(c, "HumanoidRootPart", "BasePart")
 if root then root.CanCollide = false end
-if hatcollide and c:FindFirstChildOfClass("Accessory") then
+if HatCollide and c:FindFirstChildOfClass("Accessory") then
     local anything = gp(c, "Health", "Script")
     if not (torso and root and anything) then
         return
     end
-
-c.HumanoidRootPart.CFrame = c.HumanoidRootPart.CFrame + Vector3.new(0,40,0)
 
 for i,v in pairs(c:GetChildren()) do
     if v:IsA("Accessory") then
@@ -375,10 +364,13 @@ for i,v in pairs(c:GetChildren()) do
 end
 
     c["Body Colors"]:Remove()
+    
+
     torso:Destroy()
     root:Destroy()
     anything:Destroy()
-    task.wait(.15)
+    task.wait(.1)
+    
 end
 
 local model = Instance.new("Model", c)
@@ -390,7 +382,7 @@ end)
 
 for i, v in pairs(getchildren(c)) do
     if v ~= model then
-        if addtools and isa(v, "Tool") then
+        if AddTools and isa(v, "Tool") then
             for i1, v1 in pairs(getdescendants(v)) do
                 if v1 and v1.Parent and isa(v1, "BasePart") then
                     local bv = Instance.new("BodyVelocity")
@@ -417,8 +409,8 @@ else
                     save = true
                 end
                 if save then
-                    if hedafterneck then
-                        hedafterneck = v
+                    if Hedafterneck then
+                        Hedafterneck = v
                     end
                 else
                     pcall(destroy, v)
@@ -438,7 +430,7 @@ end
 pcall(destroy, cl)
 
 local uncollide, noclipcon = nil, nil
-if noclipAllParts then
+if NoclipAllParts then
     uncollide = function()
         if c then
             for i, v in pairs(getdescendants(c)) do
@@ -502,17 +494,17 @@ for i, v in pairs(getdescendants(c)) do
     end
 end
 
-if newanimate then
+if NewAnimate then
     local animate = gp(c, "Animate", "LocalScript")
     if animate then
         animate.Disabled = false
     end
 end
 
-if addtools then
+if AddTools then
     for i, v in pairs(getchildren(c)) do
         if isa(v, "Tool") then
-            v.Parent = addtools
+            v.Parent = AddTools
         end
     end
 end
@@ -745,7 +737,18 @@ end
 
 local torso1 = torso
 torso = gp(c, "Torso", "BasePart") or ((not R15toR6) and gp(c, torso.Name, "BasePart"))
-if (typeof(hedafterneck) == "Instance") and head and torso and torso1 then
+
+                if NewTorso then
+local monkeatt1 = gp(gp(gp(c, "SeeMonkey", "Accessory"), "Handle", "BasePart"), "att1_Handle", "Attachment")
+monkeatt1.Parent = gp(c, "Torso", "BasePart")
+monkeatt1.Orientation = v3(90, 0, 0)
+local monkemesh = gp(gp(gp(model, "SeeMonkey", "Accessory"), "Handle", "BasePart"), "Mesh", "SpecialMesh")
+if monkemesh then
+    monkemesh:Destroy()
+end
+end
+
+if (typeof(Hedafterneck) == "Instance") and head and torso and torso1 then
     local conNeck, conTorso, conTorso1 = nil, nil, nil
     local aligns = {}
     local function enableAligns()
@@ -756,11 +759,13 @@ if (typeof(hedafterneck) == "Instance") and head and torso and torso1 then
             v.Enabled = true
         end
     end
-    conNeck = hedafterneck.Changed:Connect(function(prop)
+    conNeck = Hedafterneck.Changed:Connect(function(prop)
         if table.find({"Part0", "Part1", "Parent"}, prop) then
             enableAligns()
         end
     end)
+
+
     conTorso = torso:GetPropertyChangedSignal("Parent"):Connect(enableAligns)
     conTorso1 = torso1:GetPropertyChangedSignal("Parent"):Connect(enableAligns)
     for i, v in pairs(getdescendants(head)) do
