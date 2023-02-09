@@ -3,8 +3,8 @@ repeat task.wait() until game:IsLoaded()
 local Lighting = game:GetService("Lighting")
 
 local UIBlurEffect = Instance.new("DepthOfFieldEffect", Lighting)
-UIBlurEffect.FarIntensity = 6
-UIBlurEffect.FocusDistance = 8
+UIBlurEffect.FarIntensity = 5
+UIBlurEffect.FocusDistance = 14
 UIBlurEffect.InFocusRadius = 6.5
 UIBlurEffect.NearIntensity = 0.2
 
