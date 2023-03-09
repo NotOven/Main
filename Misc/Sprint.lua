@@ -1,6 +1,6 @@
 local InputService = game:GetService("UserInputService")
 local plr = game:GetService('Players').LocalPlayer
-local KeyCode = Enum.KeyCode.LeftControl
+local KeyCode = Enum.KeyCode.LeftShift
 local sprinting = false
 local NormSpeed = plr.Character:FindFirstChildOfClass('Humanoid').WalkSpeed
 
