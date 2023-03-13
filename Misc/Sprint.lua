@@ -8,9 +8,9 @@ local NormSpeed = plr.Character:FindFirstChildOfClass('Humanoid').WalkSpeed
 local Bindable = Instance.new("BindableFunction")
 function Switch(Response)
 	if Response == "Yes" then
-		local KeyCode = Enum.KeyCode.LeftShift
+		KeyCode = Enum.KeyCode.LeftShift
 	elseif Response == "No" then
-		local KeyCode = Enum.KeyCode.LeftControl
+		KeyCode = Enum.KeyCode.LeftControl
 	end
 	Bindable:Destroy()
 end
