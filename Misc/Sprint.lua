@@ -21,7 +21,7 @@ end
 InputService.InputBegan:Connect(function(input)
 	if input.KeyCode == KeyCode then
 	    if sprinting == false then NormSpeed = plr.Character:FindFirstChildOfClass('Humanoid').WalkSpeed end
-		plr.Character:FindFirstChildOfClass('Humanoid').WalkSpeed = 36
+		plr.Character:FindFirstChildOfClass('Humanoid').WalkSpeed = NormSpeed * 2.25
 		spinting = true
 	end
 end)
