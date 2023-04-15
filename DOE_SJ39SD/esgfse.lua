@@ -268,7 +268,7 @@ elseif _G.Options.Reanim_Type == "Hat" then
 			Light.OutlineTransparency = 0.5
 			Light.FillColor = Color3.new(0,255,0)
 
-			Align(BoomBox.Handle, Clone["HumanoidRootPart"], V3(0,-5,0), V3(0,0,0-0.1*math.sin(100*tick())))
+			Align(BoomBox.Handle, Clone["HumanoidRootPart"], V3(0,-4.75,0), V3(0,0,0-0.1*math.sin(100*tick())))
 
 			LocalPlayer.Backpack:ClearAllChildren()
 
