@@ -252,11 +252,18 @@ elseif _G.Options.Reanim_Type == "Hat" then
 		if BoomBox then
 			BoomBox.Parent = LocalPlayer.Backpack
 			BoomBox.Parent = Character
+			
 			Character["Right Arm"]:BreakJoints()
 			Character["Right Arm"]:Destroy()
 
 			BoomBox:WaitForChild('Handle')
 
+			if _G.Options.Block_Hats then
+			    if BoomBox.Handle:FindFirstChildWhichIsA('SpecialMesh') then
+			        BoomBox.Handle:FindFirstChildWhichIsA('SpecialMesh'):Destroy()
+			    end
+			end
+			
 			Light = Instance.new("Highlight", BoomBox.Handle)
 			Light.FillTransparency = 0.8
 			Light.OutlineTransparency = 0.5
