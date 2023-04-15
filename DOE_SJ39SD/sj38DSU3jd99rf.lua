@@ -101,7 +101,7 @@ local function Align(Part0, Part1, Pos, Ori)
 		end
 	end)
 
-	if Options.Reanim_Type == "Humanoid" then
+	if _G.Options.Reanim_Type == "Humanoid" then
 		spawn(function()
 			LocalPlayer.CharacterAdded:Wait()
 			if con0 then con0:Disconnect() end
@@ -111,7 +111,7 @@ local function Align(Part0, Part1, Pos, Ori)
 end
 
 -- Reanims
-if Options.Reanim_Type == "Humanoid" then -- Humanoid
+if _G.Options.Reanim_Type == "Humanoid" then -- Humanoid
 	local OnCharacterAdded = function(Character)
 		if Character == Clone then
 			return
@@ -177,7 +177,7 @@ if Options.Reanim_Type == "Humanoid" then -- Humanoid
 	end
 	LocalPlayer.CharacterAdded:Connect(OnCharacterAdded)
 
-elseif Options.Reanim_Type == "Hat" then
+elseif _G.Options.Reanim_Type == "Hat" then
 	if Character == Clone then 
 		return
 	end
@@ -208,12 +208,12 @@ elseif Options.Reanim_Type == "Hat" then
 	end
 
 	for i,v in pairs(Clone:GetDescendants()) do
-		if v:IsA('BasePart') and v.Parent:IsA('Accessory') and not Find(Options.Limbs, v.Parent.Name) then
+		if v:IsA('BasePart') and v.Parent:IsA('Accessory') and not Find(_G.Options.Limbs, v.Parent.Name) then
 			CharacterHat = Character:FindFirstChild(v.Parent.Name)
 			if CharacterHat then
 				Align(CharacterHat.Handle, v)
 			end
-		elseif v:IsA('BasePart') and v.Parent:IsA('Accessory') and Find(Options.Limbs, v.Parent.Name) then
+		elseif v:IsA('BasePart') and v.Parent:IsA('Accessory') and Find(_G.Options.Limbs, v.Parent.Name) then
 			Hat = Character:FindFirstChild(v.Parent.Name)
 			if Hat then
 				if Hat.Handle:FindFirstChildWhichIsA('SpecialMesh') then Hat.Handle:FindFirstChildWhichIsA('SpecialMesh'):Destroy() end
@@ -237,7 +237,7 @@ elseif Options.Reanim_Type == "Hat" then
 	end
 
 
-	if Options.Block_Hats then
+	if _G.Options.Block_Hats then
 		for i,v in pairs(Character:GetChildren()) do
 			if v:IsA('Accessory') or v:IsA('Tool') then
 				if (v:FindFirstChild('Handle') and v:FindFirstChild('Handle'):FindFirstChildWhichIsA('SpecialMesh')) then
@@ -247,7 +247,7 @@ elseif Options.Reanim_Type == "Hat" then
 		end
 	end
 
-	if Options.BoomBox_Enabled then
+	if _G.Options.BoomBox_Enabled then
 		local BoomBox = Character:FindFirstChild('BoomBox') or LocalPlayer.Backpack:FindFirstChild('BoomBox')
 		if BoomBox then
 			BoomBox.Parent = LocalPlayer.Backpack
