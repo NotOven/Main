@@ -24,7 +24,7 @@ local Angles = CFrame.Angles
 local Insert = table.insert
 local Find = table.find
 
-local Options = _G.Options
+--local Options = _G.Options
 
 -- Clone
 Character.Archivable = true
@@ -322,4 +322,10 @@ elseif Options.Reanim_Type == "Hat" then
 	Camera.CameraSubject = Clone:FindFirstChildOfClass('Humanoid')
 
 end
+
+spawn(function()
+    Clone:FindFirstChildOfClass'Humanoid'.Died:Connect(function()
+        GetService.TeleportService:TeleportToPlaceInstance(game.PlaceId, game.JobId, Players)
+    end)
+end)
 --
