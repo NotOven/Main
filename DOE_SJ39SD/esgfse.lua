@@ -24,7 +24,7 @@ local Angles = CFrame.Angles
 local Insert = table.insert
 local Find = table.find
 
---local Options = _G.Options
+local Options = _G.Options
 
 -- Clone
 Character.Archivable = true
